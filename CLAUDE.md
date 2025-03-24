@@ -1,28 +1,23 @@
 # OpenPDF Development Guidelines
 
-## Development Setup
-- This is a static HTML/JS project with no build system
-- Run locally: Open index.html in a browser or use a local server: `python -m http.server` or `npx serve`
-- Testing: Manual browser testing is required; no automated tests exist
+## Project Setup and Commands
+- **Run locally:** Simply open index.html in a browser or use a local server
+- **Testing:** No automated tests yet; manual testing via browser
+- **Linting:** No linters configured; follow existing code style
 
 ## Code Style Guidelines
-- HTML: Use semantic tags, double quotes for attributes
-- CSS: Use kebab-case for class names, organize by component
-- JavaScript:
-  - Use camelCase for variables and functions
-  - Use const/let, avoid var
-  - Prefer async/await over raw promises
-  - Include error handling in all async functions
-  - Follow defensive coding practices with null checks
+- **Formatting:** Use 2-space indentation for all files (HTML, CSS, JS)
+- **Naming:** camelCase for JS variables/functions, kebab-case for CSS classes
+- **JS Organization:** Group related functionality in namespaced objects (utils, ui, api, handlers)
+- **Error Handling:** Use try/catch blocks with informative error messages
+- **Security:** Always sanitize user input and validate URLs before use
+- **CSS Variables:** Use CSS custom properties for consistent theming
+- **DOM Manipulation:** Use utility functions to ensure XSS protection
 
-## Organization
-- Keep functions small and focused on a single task
-- Group related functions together in the codebase
-- Use descriptive variable and function names
-- Always validate user input (as done with DOI regex)
-- Handle API errors with user-friendly messages
-
-## Error Handling
-- Always include try/catch blocks around async operations
-- Provide specific, user-friendly error messages
-- Log errors to console for debugging
+## Best Practices
+- Validate and sanitize all user inputs
+- Properly handle API errors with meaningful messages
+- Follow content security policy rules in index.html
+- Use JavaScript modules pattern for code organization
+- Maintain responsive design for mobile compatibility
+- Implement proper error states and loading indicators
