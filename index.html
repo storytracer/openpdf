@@ -8,10 +8,20 @@
     /* Global styles */
     body {
       font-family: system-ui, sans-serif;
+      margin: 0;
+      line-height: 1.6;
+    }
+    
+    .container {
+      width: 100%;
       max-width: 40rem;
       margin: 0 auto;
       padding: 2rem;
-      line-height: 1.6;
+      box-sizing: border-box;
+    }
+
+    #app-content {
+      width: 100%;
     }
 
     h1 {
@@ -23,19 +33,35 @@
       padding: 1rem;
       background-color: #f5f5f5;
       border-radius: 4px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     /* Alert component */
+    #alert-container {
+      width: 100%;
+    }
+    
     .alert {
+      width: 100%;
       padding: 1rem;
       border-radius: 4px;
       margin-bottom: 1.5rem;
+      box-sizing: border-box;
     }
+    
     .alert-error {
       background-color: #ffebee;
       color: #c62828;
       border: 1px solid #ef9a9a;
     }
+    
+    .alert-warning {
+      background-color: #fff8e1;
+      color: #f57f17;
+      border: 1px solid #ffe082;
+    }
+    
     .alert-success {
       background-color: #e8f5e9;
       color: #2e7d32;
@@ -45,7 +71,9 @@
     /* DOI form */
     .doi-form {
       margin: 2rem 0;
+      width: 100%;
     }
+    
     input {
       width: 100%;
       padding: 0.75rem;
@@ -53,6 +81,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       font-size: 1rem;
+      box-sizing: border-box;
     }
     button {
       background: #4a69bd;
@@ -69,25 +98,27 @@
   </style>
 </head>
 <body>
-  <div id="app-content">
-    <h1>OpenPDF</h1>
-    <h3>Find the PDF for Open Access publications</h3>
-    
-    <div id="alert-container"></div>
-    
-    <p>
-      Enter a DOI or DOI URL to directly get the full-text PDF. For non-Open Access publications, you'll be redirected to the publisher's website.
-    </p>
+  <div class="container">
+    <div id="app-content">
+      <h1>OpenPDF</h1>
+      <h3>Find the PDF for Open Access publications</h3>
+      
+      <div id="alert-container"></div>
+      
+      <p>
+        Enter a DOI or DOI URL to directly get the full-text PDF. For non-Open Access publications, you'll be redirected to the publisher's website.
+      </p>
 
-    <form id="doi-form" class="doi-form">
-      <input
-        type="text"
-        id="doi-input"
-        placeholder="Enter a DOI like 10.4018/IJWLTT.20211101.oa4 or https://doi.org/10.4018/IJWLTT.20211101.oa4"
-        required
-      />
-      <button type="submit">Find PDF</button>
-    </form>
+      <form id="doi-form" class="doi-form">
+        <input
+          type="text"
+          id="doi-input"
+          placeholder="Enter a DOI like 10.4018/IJWLTT.20211101.oa4 or https://doi.org/10.4018/IJWLTT.20211101.oa4"
+          required
+        />
+        <button type="submit">Find PDF</button>
+      </form>
+    </div>
   </div>
 
   <script>
@@ -145,7 +176,7 @@
           // Check if there is a primary location URL for non-Open Access publications
           const primaryUrl = work.primary_location?.landing_page_url;
           if (primaryUrl) {
-            showAlert(`This article is not Open Access. Opening publisher's website in a new window...`, 'success');
+            showAlert(`This article is not Open Access. Opening publisher's website in a new window...`, 'warning');
             setTimeout(() => {
               window.open(primaryUrl, '_blank');
             }, redirectDelay);
