@@ -204,6 +204,8 @@
       
       if (params.doi) {
         document.getElementById('doi-input').value = params.doi;
+        // Auto-submit the form if a DOI parameter is present
+        document.getElementById('doi-form').dispatchEvent(new Event('submit'));
       }
       
       if (params.success === 'true' && params.doi) {
