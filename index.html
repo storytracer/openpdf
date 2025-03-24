@@ -154,6 +154,12 @@
       
       const doiInput = document.getElementById('doi-input').value.trim();
       
+      // Check if input is empty
+      if (!doiInput) {
+        showAlert('Please enter a DOI before submitting.');
+        return;
+      }
+      
       // Validate DOI
       const match = doiInput.match(doiRegex());
       if (!match) {
@@ -202,9 +208,9 @@
       // Check URL parameters
       const params = getUrlParams();
       
-      if (params.doi) {
+      if (params.doi && params.doi.trim()) {
         document.getElementById('doi-input').value = params.doi;
-        // Auto-submit the form if a DOI parameter is present
+        // Auto-submit the form if a DOI parameter is present and not empty
         document.getElementById('doi-form').dispatchEvent(new Event('submit'));
       }
       
@@ -230,7 +236,7 @@
       
       // Check if we have a DOI in the hash
       const hashDoi = window.location.hash.replace('#', '');
-      if (hashDoi) {
+      if (hashDoi && hashDoi.trim()) {
         const match = decodeURIComponent(hashDoi).match(doiRegex());
         if (match) {
           document.getElementById('doi-input').value = match[0];
