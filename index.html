@@ -158,9 +158,9 @@
     
     .access-button {
       display: inline-block;
-      padding: 0.75rem 1rem;
+      padding: 0.5rem;
       width: 100%;
-      max-width: 100px;
+      max-width: 120px;
       margin-bottom: 0.5rem;
       border-radius: 4px;
       text-decoration: none;
@@ -189,12 +189,15 @@
     
     .no-access {
       display: inline-block;
-      padding: 0.75rem 1rem;
+      padding: 0.5rem;
+      width: 100%;
+      max-width: 120px;
       background-color: #f5f5f5;
       color: #757575;
       border: 1px dashed #bdbdbd;
       border-radius: 4px;
       font-style: italic;
+      text-align: center;
     }
   </style>
 </head>
@@ -207,7 +210,6 @@
       <div id="alert-container"></div>
       
       <div id="metadata-container">
-        <div class="metadata-title">Publication Information</div>
         <div id="metadata-content"></div>
       </div>
       
@@ -295,7 +297,7 @@
         if (!pdfUrl && !landingPageUrl) {
           showAlert(`No PDF or landing page link found for DOI: ${extractedDoi}. The article might not be properly indexed.`, 'error');
         } else if (!pdfUrl) {
-          showAlert(`This article is not available as Open Access.`, 'warning');
+          showAlert(`No direct PDF link found.`, 'warning');
         } else {
           showAlert(`PDF available for this Open Access publication.`, 'success');
         }
@@ -470,7 +472,7 @@
         metadataContent.appendChild(createMetadataRow('PDF Link', pdfLink));
       } else {
         metadataContent.appendChild(createMetadataRow('PDF Link', `
-          <span class="no-access">No direct link available</span>
+          <span class="no-access">No PDF found</span>
         `));
       }
       
@@ -485,6 +487,9 @@
         metadataContent.appendChild(createMetadataRow('Landing Page', landingPageLink));
       }
       
+      // Open access status
+      metadataContent.appendChild(createMetadataRow('Access Status', getOaBadge(work.open_access?.oa_status)));
+
       // Title
       metadataContent.appendChild(createMetadataRow('Title', work.title || 'Unknown Title'));
       
@@ -498,9 +503,6 @@
       // Journal/venue
       const venue = work.primary_location?.source?.display_name || work.host_venue?.display_name || 'Unknown';
       metadataContent.appendChild(createMetadataRow('Journal', venue));
-      
-      // Open access status
-      metadataContent.appendChild(createMetadataRow('Access Status', getOaBadge(work.open_access?.oa_status)));
     }
     
     async function getOpenAlexWork(doi) {
