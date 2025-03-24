@@ -178,12 +178,12 @@
       background-color: #388e3c;
     }
     
-    .publisher-button {
+    .landing-page-button {
       background-color: #2196f3;
       color: white;
     }
     
-    .publisher-button:hover {
+    .landing-page-button:hover {
       background-color: #1976d2;
     }
     
@@ -212,7 +212,7 @@
       </div>
       
       <p>
-        Enter a DOI or DOI URL to directly get the full-text PDF. For non-Open Access publications, you'll be redirected to the publisher's website.
+        Enter a DOI or DOI URL to directly get the full-text PDF. If no direct PDF link is available, the landing page link will be displayed.
       </p>
 
       <form id="doi-form" class="doi-form">
@@ -289,11 +289,11 @@
         const work = await getOpenAlexWork(extractedDoi);
         const pdfUrl = await findPdfUrl(work);
         
-        // Check if there's a PDF or publisher URL
-        const primaryUrl = work.primary_location?.landing_page_url;
+        // Check if there's a PDF or landing page URL
+        const landingPageUrl = work.best_oa_location?.landing_page_url;
         
-        if (!pdfUrl && !primaryUrl) {
-          showAlert(`No PDF or publisher link found for DOI: ${extractedDoi}. The article might not be properly indexed.`, 'error');
+        if (!pdfUrl && !landingPageUrl) {
+          showAlert(`No PDF or landing page link found for DOI: ${extractedDoi}. The article might not be properly indexed.`, 'error');
         } else if (!pdfUrl) {
           showAlert(`This article is not available as Open Access.`, 'warning');
         } else {
@@ -301,7 +301,7 @@
         }
         
         // Display metadata with access links
-        displayMetadata(work, pdfUrl, primaryUrl);
+        displayMetadata(work, pdfUrl, landingPageUrl);
         
       } catch (error) {
         showAlert(`Failed to resolve DOI: ${extractedDoi}. ${error.message || 'Unknown error'}`);
@@ -367,7 +367,7 @@
 
     // OpenAlex API functions
     // Function to display publication metadata
-    function displayMetadata(work, pdfUrl, publisherUrl) {
+    function displayMetadata(work, pdfUrl, landingPageUrl) {
       const metadataContainer = document.getElementById('metadata-container');
       const metadataContent = document.getElementById('metadata-content');
       
@@ -474,15 +474,15 @@
         `));
       }
       
-      if (publisherUrl) {
+      if (landingPageUrl) {
         // Sanitize URL
-        const sanitizedPublisherUrl = encodeURI(publisherUrl);
-        const publisherLink = `
-          <a href="${sanitizedPublisherUrl}" target="_blank" rel="noopener noreferrer" class="access-button publisher-button">
-            Publisher
+        const sanitizedLandingPageUrl = encodeURI(landingPageUrl);
+        const landingPageLink = `
+          <a href="${sanitizedLandingPageUrl}" target="_blank" rel="noopener noreferrer" class="access-button landing-page-button">
+            Landing Page
           </a>
         `;
-        metadataContent.appendChild(createMetadataRow('Publisher', publisherLink));
+        metadataContent.appendChild(createMetadataRow('Landing Page', landingPageLink));
       }
       
       // Title
