@@ -247,11 +247,17 @@
     // Show alert message
     function showAlert(message, type = 'error') {
       const alertContainer = document.getElementById('alert-container');
-      alertContainer.innerHTML = `
-        <div class="alert alert-${type}">
-          ${message}
-        </div>
-      `;
+      
+      // Sanitize inputs to prevent XSS
+      const sanitizedType = type.replace(/[^\w-]/g, '');
+      const sanitizedMessage = document.createTextNode(message);
+      
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${sanitizedType}`;
+      alertDiv.appendChild(sanitizedMessage);
+      
+      alertContainer.innerHTML = '';
+      alertContainer.appendChild(alertDiv);
     }
 
     // Handle form submission
@@ -308,24 +314,32 @@
       const params = getUrlParams();
       
       if (params.doi && params.doi.trim()) {
-        document.getElementById('doi-input').value = params.doi;
+        // Sanitize DOI parameter before setting value
+        const sanitizedDoi = params.doi.replace(/[<>"'&]/g, '');
+        document.getElementById('doi-input').value = sanitizedDoi;
         // Auto-submit the form if a DOI parameter is present and not empty
         document.getElementById('doi-form').dispatchEvent(new Event('submit'));
       }
       
       if (params.success === 'true' && params.doi) {
-        showAlert(`Successfully found PDF for DOI: ${params.doi}`, 'success');
+        // Sanitize DOI in alert message
+        const sanitizedDoi = params.doi.replace(/[<>"'&]/g, '');
+        showAlert(`Successfully found PDF for DOI: ${sanitizedDoi}`, 'success');
       } else if (params.error) {
         let alertMessage = '';
+        // Sanitize any user-provided data from URL parameters
+        const sanitizedDoi = params.doi ? params.doi.replace(/[<>"'&]/g, '') : 'Unknown';
+        const sanitizedMessage = params.message ? params.message.replace(/[<>"'&]/g, '') : 'Please try again later.';
+        
         switch(params.error) {
           case 'invalid-doi':
             alertMessage = 'The provided input does not appear to be a valid DOI. Please check and try again.';
             break;
           case 'no-pdf-found':
-            alertMessage = `No PDF or publisher location found for DOI: ${params.doi || 'Unknown'}. The article might not be indexed correctly.`;
+            alertMessage = `No PDF or publisher location found for DOI: ${sanitizedDoi}. The article might not be indexed correctly.`;
             break;
           case 'failed-to-resolve':
-            alertMessage = `Failed to resolve DOI: ${params.doi || 'Unknown'}. ${params.message || 'Please try again later.'}`;
+            alertMessage = `Failed to resolve DOI: ${sanitizedDoi}. ${sanitizedMessage}`;
             break;
           default:
             alertMessage = 'An unknown error occurred. Please try again.';
@@ -336,10 +350,17 @@
       // Check if we have a DOI in the hash
       const hashDoi = window.location.hash.replace('#', '');
       if (hashDoi && hashDoi.trim()) {
-        const match = decodeURIComponent(hashDoi).match(doiRegex());
-        if (match) {
-          document.getElementById('doi-input').value = match[0];
-          document.getElementById('doi-form').dispatchEvent(new Event('submit'));
+        try {
+          const decodedHash = decodeURIComponent(hashDoi);
+          const match = decodedHash.match(doiRegex());
+          if (match) {
+            // Sanitize DOI from hash before setting value
+            const sanitizedDoi = match[0].replace(/[<>"'&]/g, '');
+            document.getElementById('doi-input').value = sanitizedDoi;
+            document.getElementById('doi-form').dispatchEvent(new Event('submit'));
+          }
+        } catch (e) {
+          console.error('Error processing hash DOI:', e);
         }
       }
     });
@@ -358,12 +379,26 @@
       
       // Function to create a metadata row
       function createMetadataRow(label, value) {
-        return `
-          <div class="metadata-row">
-            <div class="metadata-label">${label}</div>
-            <div class="metadata-value">${value}</div>
-          </div>
-        `;
+        const row = document.createElement('div');
+        row.className = 'metadata-row';
+        
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'metadata-label';
+        labelDiv.textContent = label;
+        
+        const valueDiv = document.createElement('div');
+        valueDiv.className = 'metadata-value';
+        
+        // If value contains HTML (for links), set it safely
+        if (typeof value === 'string' && (value.includes('<a ') || value.includes('<span '))) {
+          valueDiv.innerHTML = value;
+        } else {
+          valueDiv.textContent = value;
+        }
+        
+        row.appendChild(labelDiv);
+        row.appendChild(valueDiv);
+        return row;
       }
       
       // Function to format date
@@ -383,10 +418,22 @@
       
       // Function to get OA status badge
       function getOaBadge(oaStatus) {
-        if (!oaStatus) return '<span class="oa-badge oa-closed">Closed</span>';
+        // Create badge element
+        const badge = document.createElement('span');
+        badge.className = 'oa-badge';
+        
+        if (!oaStatus) {
+          badge.classList.add('oa-closed');
+          badge.textContent = 'Closed';
+          return badge.outerHTML;
+        }
+        
+        // Validate and sanitize oaStatus
+        const validStatuses = ['gold', 'green', 'bronze'];
+        const sanitizedStatus = validStatuses.includes(oaStatus) ? oaStatus : 'closed';
         
         let badgeClass = '';
-        switch(oaStatus) {
+        switch(sanitizedStatus) {
           case 'gold':
             badgeClass = 'oa-gold';
             break;
@@ -400,52 +447,60 @@
             badgeClass = 'oa-closed';
         }
         
-        return `<span class="oa-badge ${badgeClass}">${oaStatus.charAt(0).toUpperCase() + oaStatus.slice(1)}</span>`;
+        badge.classList.add(badgeClass);
+        badge.textContent = sanitizedStatus.charAt(0).toUpperCase() + sanitizedStatus.slice(1);
+        
+        return badge.outerHTML;
       }
       
-      // Build metadata content
-      let html = '';
+      // Clear previous content
+      metadataContent.innerHTML = '';
 
+      // Create and append each metadata row
+      
       // PDF Access row - always show, but with different content based on availability
       if (pdfUrl) {
-        html += createMetadataRow('PDF Link', `
-          <a href="${pdfUrl}" target="_blank" class="access-button oa-button">
+        // Sanitize URL
+        const sanitizedPdfUrl = encodeURI(pdfUrl);
+        const pdfLink = `
+          <a href="${sanitizedPdfUrl}" target="_blank" rel="noopener noreferrer" class="access-button oa-button">
             Open PDF
           </a>
-        `);
+        `;
+        metadataContent.appendChild(createMetadataRow('PDF Link', pdfLink));
       } else {
-        html += createMetadataRow('PDF Link', `
+        metadataContent.appendChild(createMetadataRow('PDF Link', `
           <span class="no-access">No direct link available</span>
-        `);
+        `));
       }
       
       if (publisherUrl) {
-        html += createMetadataRow('Publisher', `
-          <a href="${publisherUrl}" target="_blank" class="access-button publisher-button">
+        // Sanitize URL
+        const sanitizedPublisherUrl = encodeURI(publisherUrl);
+        const publisherLink = `
+          <a href="${sanitizedPublisherUrl}" target="_blank" rel="noopener noreferrer" class="access-button publisher-button">
             Publisher
           </a>
-        `);
+        `;
+        metadataContent.appendChild(createMetadataRow('Publisher', publisherLink));
       }
       
       // Title
-      html += createMetadataRow('Title', work.title || 'Unknown Title');
+      metadataContent.appendChild(createMetadataRow('Title', work.title || 'Unknown Title'));
       
       // Authors
       const authors = work.authorships?.map(a => a.author?.display_name).filter(Boolean).join(', ') || 'Unknown';
-      html += createMetadataRow('Authors', authors);
+      metadataContent.appendChild(createMetadataRow('Authors', authors));
       
       // Publication date
-      html += createMetadataRow('Published', formatDate(work.publication_date));
+      metadataContent.appendChild(createMetadataRow('Published', formatDate(work.publication_date)));
       
       // Journal/venue
       const venue = work.primary_location?.source?.display_name || work.host_venue?.display_name || 'Unknown';
-      html += createMetadataRow('Journal', venue);
+      metadataContent.appendChild(createMetadataRow('Journal', venue));
       
       // Open access status
-      html += createMetadataRow('Access Status', getOaBadge(work.open_access?.oa_status));
-      
-      // Add to the container
-      metadataContent.innerHTML = html;
+      metadataContent.appendChild(createMetadataRow('Access Status', getOaBadge(work.open_access?.oa_status)));
     }
     
     async function getOpenAlexWork(doi) {
