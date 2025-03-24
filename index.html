@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenPDF - Get the PDF for Open Access Publications</title>
+  <title>OpenPDF</title>
   <style>
     /* Global styles */
     body {
@@ -70,21 +70,20 @@
 </head>
 <body>
   <div id="app-content">
-    <h1>OpenPDF - DOI to PDF Resolver</h1>
+    <h1>OpenPDF</h1>
+    <h3>Find the PDF for Open Access publications</h3>
     
     <div id="alert-container"></div>
     
     <p>
-      Enter a DOI (e.g., <code>10.4018/IJWLTT.20211101.oa4</code>) or DOI URL (e.g.,
-      <code>https://doi.org/10.4018/IJWLTT.20211101.oa4</code>) to find the full-text PDF.
-      For non-Open Access publications, you'll be redirected to the publisher's website.
+      Enter a DOI or DOI URL to directly get the full-text PDF. For non-Open Access publications, you'll be redirected to the publisher's website.
     </p>
 
     <form id="doi-form" class="doi-form">
       <input
         type="text"
         id="doi-input"
-        placeholder="Enter DOI or DOI URL"
+        placeholder="Enter a DOI like 10.4018/IJWLTT.20211101.oa4 or https://doi.org/10.4018/IJWLTT.20211101.oa4"
         required
       />
       <button type="submit">Find PDF</button>
