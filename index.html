@@ -292,7 +292,12 @@
         const pdfUrl = await findPdfUrl(work);
         
         // Check if there's a PDF or landing page URL
-        const landingPageUrl = work.best_oa_location?.landing_page_url;
+        let landingPageUrl = work.best_oa_location?.landing_page_url;
+        
+        // Fallback to primary_location landing_page_url if best_oa_location is not available
+        if (!landingPageUrl && work.primary_location?.landing_page_url) {
+          landingPageUrl = work.primary_location.landing_page_url;
+        }
         
         if (!pdfUrl && !landingPageUrl) {
           showAlert(`No PDF or landing page link found for DOI: ${extractedDoi}. The article might not be properly indexed.`, 'error');
@@ -543,6 +548,11 @@
       // Use OpenAlex's best_oa_location pdf_url if available
       if (work.best_oa_location?.pdf_url) {
         return work.best_oa_location.pdf_url;
+      }
+      
+      // Fallback to primary_location if best_oa_location is not available
+      if (work.primary_location?.pdf_url) {
+        return work.primary_location.pdf_url;
       }
       
       return null;
