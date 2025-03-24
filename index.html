@@ -176,7 +176,7 @@
         // Fetch data from OpenAlex
         const work = await getOpenAlexWork(extractedDoi);
         const pdfUrl = await findPdfUrl(work);
-        const redirectDelay = 500;
+        const redirectDelay = 100;
         
         if (!pdfUrl) {
           // Check if there is a primary location URL for non-Open Access publications
