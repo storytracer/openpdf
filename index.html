@@ -113,7 +113,7 @@
         <input
           type="text"
           id="doi-input"
-          placeholder="Enter a DOI like 10.4018/IJWLTT.20211101.oa4 or https://doi.org/10.4018/IJWLTT.20211101.oa4"
+          placeholder="Enter 10.4018/IJWLTT.20211101.oa4 or https://doi.org/10.4018/IJWLTT.20211101.oa4"
           required
         />
         <button type="submit">Find PDF</button>
@@ -176,9 +176,9 @@
           // Check if there is a primary location URL for non-Open Access publications
           const primaryUrl = work.primary_location?.landing_page_url;
           if (primaryUrl) {
-            showAlert(`This article is not Open Access. Opening publisher's website in a new window...`, 'warning');
+            showAlert(`This article is not Open Access. Opening publisher's website...`, 'warning');
             setTimeout(() => {
-              window.open(primaryUrl, '_blank');
+              window.open(primaryUrl, '_self');
             }, redirectDelay);
             return;
           }
@@ -187,9 +187,9 @@
         }
         
         // Redirect to PDF
-        showAlert(`PDF found. Opening in a new tab...`, 'success');
+        showAlert(`PDF found. Opening...`, 'success');
         setTimeout(() => {
-          window.open(pdfUrl, '_blank');
+          window.open(pdfUrl, '_self');
         }, redirectDelay);
         
       } catch (error) {
