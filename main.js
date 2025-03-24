@@ -252,6 +252,9 @@
           // Display metadata with access links
           ui.displayMetadata(work, pdfUrl, landingPageUrl);
           
+          // Update URL hash with the DOI
+          window.location.hash = encodeURIComponent(extractedDoi);
+          
         } catch (error) {
           ui.showAlert(`Failed to resolve DOI: ${extractedDoi}. ${error.message || 'Unknown error'}`);
         }
