@@ -405,24 +405,7 @@
       
       // Build metadata content
       let html = '';
-      
-      // Title
-      html += createMetadataRow('Title', work.title || 'Unknown Title');
-      
-      // Authors
-      const authors = work.authorships?.map(a => a.author?.display_name).filter(Boolean).join(', ') || 'Unknown';
-      html += createMetadataRow('Authors', authors);
-      
-      // Publication date
-      html += createMetadataRow('Published', formatDate(work.publication_date));
-      
-      // Journal/venue
-      const venue = work.primary_location?.source?.display_name || work.host_venue?.display_name || 'Unknown';
-      html += createMetadataRow('Journal', venue);
-      
-      // Open access status
-      html += createMetadataRow('Access Status', getOaBadge(work.open_access?.oa_status));
-      
+
       // PDF Access row - always show, but with different content based on availability
       if (pdfUrl) {
         html += createMetadataRow('PDF Link', `
@@ -443,6 +426,23 @@
           </a>
         `);
       }
+      
+      // Title
+      html += createMetadataRow('Title', work.title || 'Unknown Title');
+      
+      // Authors
+      const authors = work.authorships?.map(a => a.author?.display_name).filter(Boolean).join(', ') || 'Unknown';
+      html += createMetadataRow('Authors', authors);
+      
+      // Publication date
+      html += createMetadataRow('Published', formatDate(work.publication_date));
+      
+      // Journal/venue
+      const venue = work.primary_location?.source?.display_name || work.host_venue?.display_name || 'Unknown';
+      html += createMetadataRow('Journal', venue);
+      
+      // Open access status
+      html += createMetadataRow('Access Status', getOaBadge(work.open_access?.oa_status));
       
       // Add to the container
       metadataContent.innerHTML = html;
